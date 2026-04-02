@@ -1,0 +1,44 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Composer (if you decide to add PHP dependencies later)
+/vendor/
+composer.phar
+
+# Node modules (if you add npm dependencies later)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+yarn-debug.log*
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Log files
+*.log
+logs/
+error_log
+
+# Temporary/Cache files
+/tmp/
+/temp/
+*.tmp
+*.bak
+*.swp
