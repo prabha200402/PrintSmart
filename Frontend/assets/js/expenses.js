@@ -201,3 +201,50 @@ if (addReminderBtn) addReminderBtn.addEventListener('click', () => {
 if (searchExpenseInput) {
     searchExpenseInput.addEventListener('input', renderTable);
 }
+
+const generateReportBtn = document.getElementById('generateReportBtn');
+if (generateReportBtn) {
+    generateReportBtn.addEventListener('click', () => {
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+            alert('PDF library is loading or failed to load. Please try again.');
+            return;
+        }
+        
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        doc.setFontSize(18);
+        doc.text("PrintSmart - Expense Report", 14, 20);
+        
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 28);
+        
+        const searchTerm = searchExpenseInput ? searchExpenseInput.value.toLowerCase() : '';
+        const filteredExpenses = expenses.filter(expense => 
+            expense.category.toLowerCase().includes(searchTerm) || 
+            expense.status.toLowerCase().includes(searchTerm) ||
+            expense.id.toString().includes(searchTerm) ||
+            expense.amount.toString().includes(searchTerm)
+        );
+
+        const tableBody = filteredExpenses.map(e => [
+            `#EXP-${e.id}`, 
+            e.category, 
+            formatCurrency(e.amount),
+            formatDate(e.date).replace(',', ''), 
+            e.status
+        ]);
+        
+        doc.autoTable({
+            head: [['Expense ID', 'Category', 'Amount', 'Date', 'Status']],
+            body: tableBody,
+            startY: 35,
+            theme: 'grid',
+            styles: { fontSize: 9, cellPadding: 4 },
+            headStyles: { fillColor: [30, 64, 175] }
+        });
+        
+        doc.save("PrintSmart_Expense_Report.pdf");
+    });
+}
