@@ -18,6 +18,7 @@ const apiDelete = (url, id) => {
     fetch(`${url}?id=${id}`, { method: 'DELETE' }).catch(e => console.warn('API Delete failed (Offline mode)', e));
 };
 
+const searchExpenseInput     = document.getElementById('searchExpenseInput');
 const btnNotifications       = document.getElementById('btnNotifications');
 const backFromRemindersBtn   = document.getElementById('backFromRemindersBtn');
 const reminderOverlayModal   = document.getElementById('reminderOverlayModal');
@@ -69,11 +70,19 @@ if (closeReminderOverlayBtn) closeReminderOverlayBtn.addEventListener('click', c
 
 const renderTable = () => {
     expenseTableBody.innerHTML = '';
-    if (!Array.isArray(expenses) || !expenses.length) {
+    const searchTerm = searchExpenseInput ? searchExpenseInput.value.toLowerCase() : '';
+    const filteredExpenses = expenses.filter(expense => 
+        expense.category.toLowerCase().includes(searchTerm) || 
+        expense.status.toLowerCase().includes(searchTerm) ||
+        expense.id.toString().includes(searchTerm) ||
+        expense.amount.toString().includes(searchTerm)
+    );
+
+    if (!Array.isArray(filteredExpenses) || !filteredExpenses.length) {
         expenseTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted);">No expenses found.</td></tr>`;
         return;
     }
-    expenses.forEach(expense => {
+    filteredExpenses.forEach(expense => {
         const tr = document.createElement('tr');
         const statusClass = `status-${expense.status.toLowerCase()}`;
         tr.innerHTML = `
@@ -188,3 +197,7 @@ if (addReminderBtn) addReminderBtn.addEventListener('click', () => {
     const rm = document.getElementById('reminderModal');
     if (rm) openModal(rm);
 });
+
+if (searchExpenseInput) {
+    searchExpenseInput.addEventListener('input', renderTable);
+}
