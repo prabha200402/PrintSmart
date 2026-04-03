@@ -19,36 +19,54 @@ const empDetails = document.getElementById('empDetails');
 const empRole    = document.getElementById('empRole');
 const empSalary  = document.getElementById('empSalary');
 
+const searchInput = document.getElementById('searchInput');
+let employeesList = [];
+
 // Fetch and render employee list
 async function fetchEmployees() {
     try {
         const res = await fetch(API_EMP);
-        const employees = await res.json();
-        tableBody.innerHTML = '';
-        if (!employees.length) {
-            tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No employees found.</td></tr>';
-            return;
-        }
-        employees.forEach((emp, index) => {
-            const displayIdStr = '#EM-' + String(employees.length - index).padStart(3, '0');
-            const initials = emp.name ? emp.name.substring(0, 2).toUpperCase() : 'NA';
-            const roleStr = (emp.role || '').toLowerCase();
-            const roleClass = roleStr.includes('designer') ? 'designer' : roleStr.includes('manager') ? 'manager' :
-                              roleStr.includes('lead') ? 'lead' : roleStr.includes('operator') ? 'operator' :
-                              roleStr.includes('analyst') ? 'analyst' : 'tech';
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="id-color">${displayIdStr}</td>
-                <td><div class="name-cell"><span class="avatar blue-avatar">${initials}</span><b>${emp.name}</b></div></td>
-                <td><span class="role-badge ${roleClass}">${emp.role || ''}</span></td>
-                <td class="text-gray">${emp.phone || ''}</td>
-                <td><b>${emp.email || ''}</b></td>
-                <td class="actions">
-                    <svg class="delete-btn" data-id="${emp.id}" style="cursor:pointer;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                </td>`;
-            tableBody.appendChild(tr);
-        });
+        employeesList = await res.json();
+        renderEmployees();
     } catch (err) { console.error('Error fetching employees:', err); }
+}
+
+function renderEmployees() {
+    tableBody.innerHTML = '';
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+    
+    const filteredEmployees = employeesList.filter(emp => {
+        return (emp.name && emp.name.toLowerCase().includes(searchTerm)) ||
+               (emp.role && emp.role.toLowerCase().includes(searchTerm)) ||
+               (emp.email && emp.email.toLowerCase().includes(searchTerm)) ||
+               (emp.phone && emp.phone.toLowerCase().includes(searchTerm)) ||
+               (emp.id && String(emp.id).includes(searchTerm));
+    });
+
+    if (!filteredEmployees.length) {
+        tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No employees found.</td></tr>';
+        return;
+    }
+    filteredEmployees.forEach(emp => {
+        const originalIndex = employeesList.indexOf(emp);
+        const displayIdStr = '#EM-' + String(employeesList.length - originalIndex).padStart(3, '0');
+        const initials = emp.name ? emp.name.substring(0, 2).toUpperCase() : 'NA';
+        const roleStr = (emp.role || '').toLowerCase();
+        const roleClass = roleStr.includes('designer') ? 'designer' : roleStr.includes('manager') ? 'manager' :
+                          roleStr.includes('lead') ? 'lead' : roleStr.includes('operator') ? 'operator' :
+                          roleStr.includes('analyst') ? 'analyst' : 'tech';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="id-color">${displayIdStr}</td>
+            <td><div class="name-cell"><span class="avatar blue-avatar">${initials}</span><b>${emp.name}</b></div></td>
+            <td><span class="role-badge ${roleClass}">${emp.role || ''}</span></td>
+            <td class="text-gray">${emp.phone || ''}</td>
+            <td><b>${emp.email || ''}</b></td>
+            <td class="actions">
+                <svg class="delete-btn" data-id="${emp.id}" style="cursor:pointer;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </td>`;
+        tableBody.appendChild(tr);
+    });
 }
 
 // Delete employee
@@ -112,3 +130,7 @@ tableBody.addEventListener('click', function (e) {
 });
 
 document.addEventListener('DOMContentLoaded', fetchEmployees);
+
+if (searchInput) {
+    searchInput.addEventListener('input', renderEmployees);
+}
