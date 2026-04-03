@@ -112,3 +112,106 @@ tableBody.addEventListener('click', function (e) {
 });
 
 document.addEventListener('DOMContentLoaded', fetchEmployees);
+
+const reportBtn = document.querySelector('.report-btn');
+if (reportBtn) {
+    reportBtn.addEventListener('click', async () => {
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+            alert('PDF library is not loaded properly.');
+            return;
+        }
+
+        try {
+            // Fetch the latest employee data
+            const res = await fetch(API_EMP);
+            const employees = await res.json();
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Add title
+            doc.setFontSize(18);
+            doc.text('Employee Report', 14, 22);
+
+            // Add generation date
+            doc.setFontSize(11);
+            doc.setTextColor(100);
+            const dateStr = new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString();
+            doc.text(`Generated on: ${dateStr}`, 14, 30);
+
+            // Setup table data
+            const tableColumn = ["ID", "Name", "Role", "Phone", "Email"];
+            const tableRows = [];
+
+            employees.forEach((emp, index) => {
+                const displayIdStr = '#EM-' + String(employees.length - index).padStart(3, '0');
+                tableRows.push([
+                    displayIdStr,
+                    emp.name || '',
+                    emp.role || '',
+                    emp.phone || '',
+                    emp.email || ''
+                ]);
+            });
+
+            doc.autoTable({
+                head: [tableColumn],
+                body: tableRows,
+                startY: 40,
+                theme: 'grid',
+                styles: { fontSize: 9 },
+                headStyles: { fillColor: [79, 70, 229] }
+            });
+
+            // --- Analysis Section ---
+            const finalY = doc.lastAutoTable.finalY || 40;
+            
+            doc.setFontSize(14);
+            doc.setTextColor(0);
+            doc.text("Analysis Summary", 14, finalY + 15);
+            
+            const totalEmployees = employees.length;
+            let roleDistribution = {};
+            let totalSalary = 0;
+            let hasSalaryData = false;
+            
+            employees.forEach(emp => {
+                const role = emp.role || 'Unassigned';
+                roleDistribution[role] = (roleDistribution[role] || 0) + 1;
+                
+                if (emp.salary) {
+                    const sal = parseFloat(String(emp.salary).replace(/[^0-9.-]+/g, ""));
+                    if (!isNaN(sal)) {
+                        totalSalary += sal;
+                        hasSalaryData = true;
+                    }
+                }
+            });
+            
+            doc.setFontSize(11);
+            doc.setTextColor(50);
+            doc.text(`Total Employees: ${totalEmployees}`, 14, finalY + 25);
+            
+            let yPos = finalY + 25;
+            
+            if (hasSalaryData) {
+                yPos += 7;
+                doc.text(`Total Salary Burden: $${totalSalary.toFixed(2)}`, 14, yPos);
+            }
+            
+            yPos += 10;
+            doc.text("Role Breakdown:", 14, yPos);
+            yPos += 7;
+            
+            for (const [role, count] of Object.entries(roleDistribution)) {
+                doc.text(`- ${role}: ${count}`, 20, yPos);
+                yPos += 7;
+            }
+
+            doc.save('Employee_Report.pdf');
+        } catch (err) {
+            console.error('Error generating report:', err);
+            alert('Failed to generate the report data.');
+        }
+    });
+}
