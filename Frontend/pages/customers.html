@@ -4,54 +4,184 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrintSmart - Customer Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/global.css">
     <link rel="stylesheet" href="../assets/css/customers.css">
+    <style>
+        /* Additional styles for profile modal and search bar alignment */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .header-text {
+            flex: 1;
+        }
+        .top-bar-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        .search-box {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 40px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+        .search-box:focus-within {
+            border-color: #1e40af;
+            box-shadow: 0 0 0 3px rgba(30,64,175,0.1);
+        }
+        .search-box input {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 260px;
+            font-size: 14px;
+        }
+        /* Profile modal - uses same blue header as add/edit form */
+        .profile-modal .modal-header {
+            background-color: #0c4ea3;
+            color: white;
+            padding: 20px 25px;
+        }
+        .profile-modal .modal-header h2 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .profile-modal .modal-body {
+            padding: 25px;
+        }
+        .info-section {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 0; /* no order history, so no bottom margin needed */
+        }
+        .info-section h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .info-item label {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #64748b;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .info-item .value {
+            font-size: 15px;
+            font-weight: 500;
+            color: #1e293b;
+            word-break: break-word;
+        }
+        .actions svg.action-delete {
+            stroke: #dc2626;
+        }
+        .actions svg.action-delete:hover {
+            stroke: #b91c1c;
+            transform: scale(1.05);
+        }
+        .actions svg.action-view:hover,
+        .actions svg.action-edit:hover {
+            stroke: #1e40af;
+            transform: scale(1.05);
+        }
+    </style>
 </head>
 <body>
 <div class="page-container">
+    <!-- SIDEBAR (unchanged) -->
     <aside class="sidebar">
         <div class="logo">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="brand-icon">
-                <path d="M19 8H5C3.34315 8 2 9.34315 2 11V17H6V21H18V17H22V11C22 9.34315 20.6569 8 19 8Z" fill="currentColor"/>
-                <path d="M16 3H8V8H16V3Z" fill="currentColor"/>
-                <path d="M16 15H8V19H16V15Z" fill="#FFFFFF"/>
+                <path d="M19 8H5C3.34315 8 2 9.34315 2 11V17H6V21H18V17H22V11C22 9.34315 20.6569 8 19 8Z" fill="#1D4ED8"/>
+                <path d="M16 3H8V8H16V3Z" fill="#1D4ED8"/>
+                <path d="M16 15H8V19H16V15Z" fill="#ffffff"/>
             </svg>
             PrintSmart
         </div>
         <nav class="menu">
-            <a href="../index.html" class="menu-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Dashboard</a>
-            <a href="orders.html" class="menu-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg> Order Management</a>
-            <a href="customers.html" class="menu-item active"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg> Customer Management</a>
-            <a href="suppliers.html" class="menu-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> Supplier Management</a>
-            <a href="employees.html" class="menu-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Employee Management</a>
-            <a href="expenses.html" class="menu-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Expense Management</a>
+            <a href="../index.html" class="menu-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Dashboard
+            </a>
+            <a href="orders.html" class="menu-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                Order Management
+            </a>
+            <a href="customers.html" class="menu-item active">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Customer Management
+            </a>
+            <a href="suppliers.html" class="menu-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                Supplier Management
+            </a>
+            <a href="employees.html" class="menu-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                Employee Management
+            </a>
+            <a href="expenses.html" class="menu-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                Expense Management
+            </a>
         </nav>
-        <div class="user-info-box mt-auto" style="margin-top:auto;">
+        <div class="user-info-box">
             <div class="user-profile">
-                <div class="user-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-                <div class="user-text"><strong>Admin User</strong><br><span>admin@printsmart.com</span></div>
+                <div class="user-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <div class="user-text">
+                    <strong>Admin User</strong><br>
+                    <span>admin@printsmart.com</span>
+                </div>
             </div>
-            <a href="#" class="logout-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Log out</a>
+            <a href="#" class="logout-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Log out
+            </a>
         </div>
     </aside>
 
+    <!-- MAIN CONTENT -->
     <main class="main">
-        <header class="top-bar">
+        <div class="top-bar">
             <div class="header-text">
                 <h1>Customer Management</h1>
                 <p>Monitor and manage all customers.</p>
             </div>
-            <div style="display:flex; gap:16px; align-items:center;">
+            <div class="top-bar-actions">
                 <div class="search-box">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="text" id="searchInput" placeholder="Search customers..." disabled style="border:none; outline:none; background:transparent; margin-left:8px; width:100%;">
+                    <input type="text" id="searchInput" placeholder="Search by name, email or phone...">
                 </div>
                 <button class="btn-primary" id="openAddCustomerBtn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle; margin-right:4px;"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-                    Add New Customer
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                    Add Customer
                 </button>
             </div>
-        </header>
+        </div>
 
         <div class="table-container">
             <table>
@@ -69,27 +199,45 @@
                     <tr><td colspan="6" class="loading">Loading customers...</td></tr>
                 </tbody>
             </table>
+            <div id="paginationControls" class="pagination"></div>
         </div>
 
-        <button class="report-btn" id="reportBtn" disabled>
+        <button class="report-btn" id="reportBtn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="11" y2="17"/></svg>
             Generate a Report
         </button>
-    </div>
+    </main>
 </div>
 
-<!-- Customer Modal -->
+<!-- MODAL: Add / Edit Customer -->
 <div id="customerModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><h2 id="modalTitle">Add New Customer</h2></div>
+        <div class="modal-header">
+            <h2 id="modalTitle">Add New Customer</h2>
+        </div>
         <div class="modal-body">
-            <div class="form-group"><label>CUSTOMER NAME *</label><input type="text" id="custName" placeholder="Enter customer name"></div>
-            <div class="form-row">
-                <div class="form-group half"><label>EMAIL</label><input type="email" id="custEmail" placeholder="Enter Email"></div>
-                <div class="form-group half"><label>CONTACT NUMBER *</label><input type="text" id="custPhone" placeholder="Enter Phone Number"></div>
+            <div class="form-group">
+                <label>CUSTOMER NAME *</label>
+                <input type="text" id="custName" placeholder="Enter customer name">
             </div>
-            <div class="form-group"><label>ADDRESS</label><input type="text" id="custAddress" placeholder="Enter Address"></div>
-            <div class="form-group"><label>ADDITIONAL DETAILS (OPTIONAL)</label><textarea id="custDetails" placeholder="Enter customer preferences" rows="3"></textarea></div>
+            <div class="form-row">
+                <div class="form-group half">
+                    <label>EMAIL</label>
+                    <input type="email" id="custEmail" placeholder="Enter Email">
+                </div>
+                <div class="form-group half">
+                    <label>CONTACT NUMBER *</label>
+                    <input type="text" id="custPhone" placeholder="Enter Phone Number (digits only)">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>ADDRESS</label>
+                <input type="text" id="custAddress" placeholder="Enter Address">
+            </div>
+            <div class="form-group">
+                <label>ADDITIONAL DETAILS (OPTIONAL)</label>
+                <textarea id="custDetails" placeholder="Enter customer preferences (notes only)" rows="3"></textarea>
+            </div>
         </div>
         <div class="modal-footer">
             <button class="cancel-btn" id="closeModalBtn">Cancel</button>
@@ -98,35 +246,86 @@
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
+<!-- MODAL: Delete Confirmation -->
 <div id="deleteConfirmModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><h2>Confirm Deletion</h2></div>
-        <div class="modal-body"><p id="deleteMessage">Are you sure you want to delete this customer?</p></div>
+        <div class="modal-header">
+            <h2>Confirm Deletion</h2>
+        </div>
+        <div class="modal-body">
+            <p id="deleteMessage">Are you sure you want to delete this customer?</p>
+        </div>
         <div class="modal-footer">
             <button class="cancel-btn" id="closeDeleteModalBtn">Cancel</button>
-            <button class="save-btn" id="confirmDeleteBtn" style="background-color:#b91c1c;">Delete</button>
+            <button class="save-btn" id="confirmDeleteBtn" style="background-color: #b91c1c;">Delete</button>
         </div>
     </div>
 </div>
 
+<!-- MODAL: View Customer Profile (NO order history, clean personal info) -->
+<div id="viewProfileModal" class="modal">
+    <div class="modal-content profile-modal">
+        <div class="modal-header">
+            <h2 id="viewModalTitle">Customer Profile</h2>
+        </div>
+        <div class="modal-body">
+            <div class="info-section">
+                <h3>📋 Personal Info</h3>
+                <div class="info-grid">
+                    <div class="info-item"><label>EMAIL</label>
+                        <div class="value" id="viewEmail">—</div></div>
+                    <div class="info-item"><label>PHONE</label><div class="value" id="viewPhone">—</div></div>
+                    <div class="info-item"><label>ADDRESS</label><div class="value" id="viewAddress">—</div></div>
+                    <div class="info-item"><label>ADDITIONAL DETAILS</label><div class="value" id="viewDetails">—</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="save-btn" id="closeViewModalBtn" style="background-color: #b91c1c;">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST NOTIFICATION -->
 <div id="toastOverlay" class="toast-overlay">
-    <div class="toast-message" id="toastMessage">Added Successfully !!!</div>
+    <div class="toast-message" id="toastMessage">Success !</div>
 </div>
 
 <script>
+    // ========================
+    // CUSTOMER MANAGEMENT JS (no order history)
+    // ========================
     const API_URL = '../../Backend/api/customers.php';
+    let currentPage = 1;
+    let currentSearch = '';
 
-    const tbody       = document.getElementById('customerTableBody');
-    const modal       = document.getElementById('customerModal');
-    const modalTitle  = document.getElementById('modalTitle');
-    const saveBtn     = document.getElementById('saveCustomerBtn');
+    // DOM Elements
+    const tbody = document.getElementById('customerTableBody');
+    const paginationDiv = document.getElementById('paginationControls');
+    const searchInput = document.getElementById('searchInput');
+    const openAddBtn = document.getElementById('openAddCustomerBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const modal = document.getElementById('customerModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const saveBtn = document.getElementById('saveCustomerBtn');
     const toastOverlay = document.getElementById('toastOverlay');
-    const toastMsg    = document.getElementById('toastMessage');
+    const toastMsg = document.getElementById('toastMessage');
+    const reportBtn = document.getElementById('reportBtn');
     const deleteModal = document.getElementById('deleteConfirmModal');
+    const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     const deleteMessageSpan = document.getElementById('deleteMessage');
 
-    let pendingDeleteId = null, pendingDeleteName = '', editingCustomerId = null;
+    // Form fields
+    const custName = document.getElementById('custName');
+    const custEmail = document.getElementById('custEmail');
+    const custPhone = document.getElementById('custPhone');
+    const custAddress = document.getElementById('custAddress');
+    const custDetails = document.getElementById('custDetails');
+
+    let editingCustomerId = null;
+    let pendingDeleteId = null;
+    let pendingDeleteName = '';
 
     function showToast(message, isError = false) {
         toastMsg.textContent = message;
@@ -136,76 +335,14 @@
     }
 
     function resetModalToAdd() {
-        modalTitle.textContent = 'Add New Customer'; saveBtn.textContent = 'Save Customer';
+        modalTitle.textContent = 'Add New Customer';
+        saveBtn.textContent = 'Save Customer';
         editingCustomerId = null;
-        ['custName','custEmail','custPhone','custAddress','custDetails'].forEach(id => document.getElementById(id).value = '');
-    }
-
-    async function loadCustomers() {
-        try {
-            const res  = await fetch(API_URL);
-            const data = await res.json();
-            if (data.success) renderTable(data.data);
-            else showToast('Failed to load customers', true);
-        } catch { showToast('Server error', true); }
-    }
-
-    function renderTable(customers) {
-        if (!customers.length) { tbody.innerHTML = '<tr><td colspan="6" class="loading">No customers found</td></tr>'; return; }
-        tbody.innerHTML = customers.map(c => `
-            <tr>
-                <td class="id-color">${escapeHtml(c.customer_id)}</td>
-                <td><b>${escapeHtml(c.name)}</b></td>
-                <td class="text-gray">${escapeHtml(c.phone)}</td>
-                <td class="text-gray">${escapeHtml(c.address||'')}</td>
-                <td><b>${escapeHtml(c.email||'')}</b></td>
-                <td class="actions">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="editCustomer('${c.id}','${escapeHtml(c.name)}','${escapeHtml(c.phone)}','${escapeHtml(c.email||'')}','${escapeHtml(c.address||'')}')"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" onclick="showDeleteConfirm('${c.id}','${escapeHtml(c.name)}')"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                </td>
-            </tr>`).join('');
-    }
-
-    function showDeleteConfirm(id, name) {
-        pendingDeleteId = id; pendingDeleteName = name;
-        deleteMessageSpan.textContent = `Delete "${name}"? This cannot be undone.`;
-        deleteModal.style.display = 'flex';
-    }
-
-    async function performDelete() {
-        if (!pendingDeleteId) return;
-        try {
-            const res  = await fetch(`${API_URL}/${pendingDeleteId}`, { method: 'DELETE' });
-            const data = await res.json();
-            if (data.success) { showToast(`✅ "${pendingDeleteName}" deleted`); loadCustomers(); }
-            else showToast('Delete failed: ' + data.message, true);
-        } catch { showToast('Server error', true); }
-        finally { deleteModal.style.display = 'none'; pendingDeleteId = null; }
-    }
-
-    async function saveCustomer() {
-        const name = document.getElementById('custName').value.trim();
-        const phone = document.getElementById('custPhone').value.trim();
-        const email = document.getElementById('custEmail').value.trim();
-        const address = document.getElementById('custAddress').value.trim();
-        if (!name || !phone) { showToast('Name and Phone are required!', true); return; }
-
-        const url    = editingCustomerId ? `${API_URL}/${editingCustomerId}` : API_URL;
-        const method = editingCustomerId ? 'PUT' : 'POST';
-        try {
-            const res  = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify({name,phone,email,address}) });
-            const data = await res.json();
-            if (data.success) { showToast(editingCustomerId ? '✅ Customer updated' : '✅ Customer added'); modal.style.display = 'none'; resetModalToAdd(); loadCustomers(); }
-            else showToast('Error: ' + data.message, true);
-        } catch { showToast('Server error', true); }
-    }
-
-    function editCustomer(id, name, phone, email, address) {
-        modalTitle.textContent = 'Edit Customer Details'; saveBtn.textContent = 'Update Customer';
-        editingCustomerId = id;
-        document.getElementById('custName').value = name; document.getElementById('custPhone').value = phone;
-        document.getElementById('custEmail').value = email; document.getElementById('custAddress').value = address;
-        modal.style.display = 'flex';
+        custName.value = '';
+        custEmail.value = '';
+        custPhone.value = '';
+        custAddress.value = '';
+        custDetails.value = '';
     }
 
     function escapeHtml(str) {
@@ -213,13 +350,337 @@
         return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;');
     }
 
-    document.getElementById('openAddCustomerBtn').addEventListener('click', () => { resetModalToAdd(); modal.style.display = 'flex'; });
-    document.getElementById('closeModalBtn').addEventListener('click', () => { modal.style.display = 'none'; resetModalToAdd(); });
-    saveBtn.addEventListener('click', saveCustomer);
-    document.getElementById('closeDeleteModalBtn').addEventListener('click', () => { deleteModal.style.display = 'none'; });
-    document.getElementById('confirmDeleteBtn').addEventListener('click', performDelete);
-    toastOverlay.addEventListener('click', () => { toastOverlay.style.display = 'none'; });
+    function escapeJsString(str) {
+        if (!str) return '';
+        return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+    }
 
+    async function loadCustomers() {
+        try {
+            let url = `${API_URL}?page=${currentPage}&limit=5`;
+            if (currentSearch) url += `&search=${encodeURIComponent(currentSearch)}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            if (data.success) {
+                renderTable(data.data);
+                renderPagination(data.page, data.totalPages, data.total);
+            } else {
+                showToast('Failed to load customers', true);
+                tbody.innerHTML = '<tr><td colspan="6" class="loading">Error loading data</td></tr>';
+            }
+        } catch (err) {
+            showToast('Server error - unable to connect', true);
+            tbody.innerHTML = '<tr><td colspan="6" class="loading">Connection error</td></tr>';
+        }
+    }
+
+    function renderTable(customers) {
+        if (!customers.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="loading">No customers found</td></tr>';
+            return;
+        }
+        let html = '';
+        customers.forEach(c => {
+            const safeId = c.id;
+            const safeCustId = escapeHtml(c.customer_id);
+            const safeName = escapeHtml(c.name);
+            const safePhone = escapeHtml(c.phone);
+            const safeAddress = escapeHtml(c.address || '');
+            const safeEmail = escapeHtml(c.email || '');
+            html += `
+                <tr data-customer-id="${safeId}" data-name="${escapeJsString(c.name)}" data-phone="${escapeJsString(c.phone)}" data-email="${escapeJsString(c.email || '')}" data-address="${escapeJsString(c.address || '')}" data-details="${escapeJsString(c.additional_details || '')}">
+                    <td class="id-color">${safeCustId}</td>
+                    <td><b>${safeName}</b></td>
+                    <td class="text-gray">${safePhone}</td>
+                    <td class="text-gray">${safeAddress}</td>
+                    <td><b>${safeEmail}</b></td>
+                    <td class="actions">
+                        <svg class="action-view" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg class="action-edit" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        <svg class="action-delete" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function renderPagination(current, totalPages, total) {
+        if (totalPages <= 1 && total <= 5) {
+            paginationDiv.innerHTML = `<div>Showing ${total} of ${total} results</div>`;
+            return;
+        }
+        const start = (current - 1) * 5 + 1;
+        const end = Math.min(current * 5, total);
+        let html = `<div>Showing ${start} to ${end} of ${total} results</div><div style="display:flex; gap:8px;">`;
+        for (let i = 1; i <= totalPages; i++) {
+            html += `<button class="page-btn ${i === current ? 'active' : ''}" data-page="${i}">${i}</button>`;
+        }
+        html += `</div>`;
+        paginationDiv.innerHTML = html;
+        document.querySelectorAll('.page-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentPage = parseInt(btn.dataset.page);
+                loadCustomers();
+            });
+        });
+    }
+
+    function showDeleteConfirm(id, name) {
+        pendingDeleteId = id;
+        pendingDeleteName = name;
+        deleteMessageSpan.textContent = `Delete "${name}"? This action cannot be undone.`;
+        deleteModal.style.display = 'flex';
+    }
+
+    async function performDelete() {
+        if (!pendingDeleteId) return;
+        try {
+            const res = await fetch(`${API_URL}/${pendingDeleteId}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) {
+                showToast(`✅ "${pendingDeleteName}" deleted successfully`);
+                currentPage = 1;
+                loadCustomers();
+            } else {
+                showToast('Delete failed: ' + data.message, true);
+            }
+        } catch (err) {
+            showToast('Server error during deletion', true);
+        } finally {
+            deleteModal.style.display = 'none';
+            pendingDeleteId = null;
+        }
+    }
+
+    async function addCustomer() {
+        const name = custName.value.trim();
+        const phone = custPhone.value.trim();
+        const email = custEmail.value.trim();
+        const address = custAddress.value.trim();
+        const additional = custDetails.value.trim();
+
+        if (!name || !phone) {
+            showToast('Name and Phone number are required!', true);
+            return;
+        }
+        if (!/^\d+$/.test(phone)) {
+            showToast('Phone number must contain only digits', true);
+            return;
+        }
+        if (email && !/^[^\s@]+@([^\s@]+\.)+[^\s@]+$/.test(email)) {
+            showToast('Please enter a valid email address', true);
+            return;
+        }
+
+        const payload = { name, phone, email, address, additional_details: additional };
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast('✅ Customer added successfully');
+                modal.style.display = 'none';
+                resetModalToAdd();
+                currentPage = 1;
+                loadCustomers();
+            } else {
+                showToast('Error: ' + data.message, true);
+            }
+        } catch (err) {
+            showToast('Server error - add failed', true);
+        }
+    }
+
+    async function updateCustomer() {
+        if (!editingCustomerId) {
+            showToast('No customer selected', true);
+            return;
+        }
+        const name = custName.value.trim();
+        const phone = custPhone.value.trim();
+        const email = custEmail.value.trim();
+        const address = custAddress.value.trim();
+        const additional = custDetails.value.trim();
+
+        if (!name || !phone) {
+            showToast('Name and Phone are required!', true);
+            return;
+        }
+        if (!/^\d+$/.test(phone)) {
+            showToast('Phone number must contain only digits', true);
+            return;
+        }
+        if (email && !/^[^\s@]+@([^\s@]+\.)+[^\s@]+$/.test(email)) {
+            showToast('Please enter a valid email address', true);
+            return;
+        }
+
+        const payload = { name, phone, email, address, additional_details: additional };
+        try {
+            const res = await fetch(`${API_URL}/${editingCustomerId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(`✅ Customer updated successfully`);
+                modal.style.display = 'none';
+                resetModalToAdd();
+                loadCustomers();
+            } else {
+                showToast('Update failed: ' + data.message, true);
+            }
+        } catch (err) {
+            showToast('Server error - update failed', true);
+        }
+    }
+
+    function openEditModal(customerRow) {
+        const id = customerRow.dataset.customerId;
+        const name = customerRow.dataset.name;
+        const phone = customerRow.dataset.phone;
+        const email = customerRow.dataset.email;
+        const address = customerRow.dataset.address;
+        const details = customerRow.dataset.details || '';
+
+        editingCustomerId = id;
+        modalTitle.textContent = 'Edit Customer Details';
+        saveBtn.textContent = 'Update Customer';
+        custName.value = name || '';
+        custPhone.value = phone || '';
+        custEmail.value = email || '';
+        custAddress.value = address || '';
+        custDetails.value = details;
+        modal.style.display = 'flex';
+    }
+
+    // View Profile - only personal info (no orders)
+    async function viewCustomerProfile(customerId) {
+        try {
+            const res = await fetch(`${API_URL}?limit=1000`);
+            const data = await res.json();
+            if (!data.success) throw new Error('Failed to fetch customer');
+            const customer = data.data.find(c => c.id == customerId);
+            if (!customer) throw new Error('Customer not found');
+
+            document.getElementById('viewModalTitle').innerText = `Customer Profile - ${customer.name}`;
+            document.getElementById('viewEmail').innerText = customer.email || '—';
+            document.getElementById('viewPhone').innerText = customer.phone;
+            document.getElementById('viewAddress').innerText = customer.address || '—';
+            document.getElementById('viewDetails').innerText = customer.additional_details || '—';
+
+            document.getElementById('viewProfileModal').style.display = 'flex';
+        } catch (err) {
+            console.error(err);
+            showToast('Failed to load customer details', true);
+        }
+    }
+
+    async function generateReport() {
+        try {
+            let url = `${API_URL}?limit=2000`;
+            if (currentSearch) url += `&search=${encodeURIComponent(currentSearch)}`;
+            const res = await fetch(url);
+            const data = await res.json();
+            if (data.success && data.data.length) {
+                const headers = ['Customer ID', 'Name', 'Phone', 'Address', 'Email', 'Additional Details'];
+                const rows = data.data.map(c => [c.customer_id, c.name, c.phone, c.address || '', c.email || '', c.additional_details || '']);
+                const csvContent = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+                const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const fileUrl = URL.createObjectURL(blob);
+                link.href = fileUrl;
+                link.download = `customers_report_${new Date().toISOString().slice(0,19)}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(fileUrl);
+                showToast('✅ Report downloaded');
+            } else {
+                showToast('No customers to export', true);
+            }
+        } catch (err) {
+            showToast('Failed to generate report', true);
+        }
+    }
+
+    // Event delegation for table actions
+    tbody.addEventListener('click', (e) => {
+        let target = e.target;
+        while (target && target.tagName !== 'svg' && target !== tbody) {
+            target = target.parentElement;
+        }
+        if (!target || target.tagName !== 'svg') return;
+        const row = target.closest('tr');
+        if (!row) return;
+        const customerId = row.dataset.customerId;
+
+        if (target.classList.contains('action-view')) {
+            viewCustomerProfile(customerId);
+        } else if (target.classList.contains('action-edit')) {
+            openEditModal(row);
+        } else if (target.classList.contains('action-delete')) {
+            const name = row.dataset.name;
+            if (customerId && name) showDeleteConfirm(customerId, name);
+        }
+    });
+
+    // Search debounce
+    let searchTimeout;
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            currentSearch = e.target.value.trim();
+            currentPage = 1;
+            loadCustomers();
+        }, 500);
+    });
+
+    // Modal controls
+    openAddBtn.addEventListener('click', () => {
+        resetModalToAdd();
+        modal.style.display = 'flex';
+    });
+    closeModalBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+        resetModalToAdd();
+    });
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            resetModalToAdd();
+        }
+        if (e.target === deleteModal) {
+            deleteModal.style.display = 'none';
+            pendingDeleteId = null;
+        }
+        if (e.target === document.getElementById('viewProfileModal')) {
+            document.getElementById('viewProfileModal').style.display = 'none';
+        }
+    });
+    saveBtn.addEventListener('click', () => {
+        if (editingCustomerId) updateCustomer();
+        else addCustomer();
+    });
+    reportBtn.addEventListener('click', generateReport);
+    closeDeleteModalBtn.addEventListener('click', () => {
+        deleteModal.style.display = 'none';
+        pendingDeleteId = null;
+    });
+    confirmDeleteBtn.addEventListener('click', performDelete);
+    toastOverlay.addEventListener('click', () => {
+        toastOverlay.style.display = 'none';
+    });
+    document.getElementById('closeViewModalBtn').addEventListener('click', () => {
+        document.getElementById('viewProfileModal').style.display = 'none';
+    });
+
+    // Initial load
     loadCustomers();
 </script>
 </body>
