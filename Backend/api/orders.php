@@ -12,11 +12,24 @@ require_once __DIR__ . '/../config/db_connect.php';
 $action = $_REQUEST['action'] ?? '';
 
 switch ($action) {
-    case 'get_orders':    getOrders($pdo);    break;
-    case 'get_customers': getCustomers($pdo); break;
-    case 'add_order':     addOrder($pdo);     break;
-    case 'delete_order':  deleteOrder($pdo);  break;
-    default: echo json_encode(['success' => false, 'message' => 'Invalid action']);
+    case 'get_orders':  
+        getOrders($pdo);    
+        break;
+
+    case 'get_customers': 
+        getCustomers($pdo); 
+        break;
+
+    case 'add_order':     
+        addOrder($pdo);     
+        break;
+
+    case 'delete_order':  
+        deleteOrder($pdo);  
+        break;
+
+    default: 
+    echo json_encode(['success' => false, 'message' => 'Invalid action']);
 }
 
 function getOrders($pdo): void {
@@ -27,11 +40,7 @@ function getOrders($pdo): void {
     $stmt = $pdo->query($sql);
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Fallbacks if customer deleted
-    foreach ($orders as &$order) {
-        if (empty($order['customer_name'])) $order['customer_name'] = 'Unknown';
-        if (empty($order['customer_code'])) $order['customer_code'] = '';
-    }
+    
     
     echo json_encode(['success' => true, 'data' => $orders]);
 }
