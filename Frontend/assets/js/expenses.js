@@ -228,6 +228,53 @@ if (generateReportBtn) {
             expense.amount.toString().includes(searchTerm)
         );
 
+        let totalExpensesAmount = 0;
+        let categoryTotals = {};
+        let statusTotals = {};
+
+        filteredExpenses.forEach(e => {
+            const amt = parseFloat(e.amount) || 0;
+            totalExpensesAmount += amt;
+            if (!categoryTotals[e.category]) categoryTotals[e.category] = 0;
+            categoryTotals[e.category] += amt;
+            if (!statusTotals[e.status]) statusTotals[e.status] = 0;
+            statusTotals[e.status] += amt;
+        });
+
+        doc.setFontSize(14);
+        doc.setTextColor(0);
+        doc.text("Expense Analysis Summary", 14, 40);
+
+        doc.setFontSize(11);
+        doc.text(`Total Expense Amount: ${formatCurrency(totalExpensesAmount)}`, 14, 48);
+
+        const categoryData = Object.keys(categoryTotals).map(cat => [cat, formatCurrency(categoryTotals[cat])]);
+        doc.autoTable({
+            head: [['Category Breakdown', 'Total Amount']],
+            body: categoryData,
+            startY: 55,
+            theme: 'grid',
+            styles: { fontSize: 9, cellPadding: 4 },
+            headStyles: { fillColor: [46, 204, 113] }
+        });
+
+        let finalY = doc.lastAutoTable.finalY || 55;
+
+        const statusData = Object.keys(statusTotals).map(st => [st, formatCurrency(statusTotals[st])]);
+        doc.autoTable({
+            head: [['Status Breakdown', 'Total Amount']],
+            body: statusData,
+            startY: finalY + 10,
+            theme: 'grid',
+            styles: { fontSize: 9, cellPadding: 4 },
+            headStyles: { fillColor: [243, 156, 18] }
+        });
+
+        finalY = doc.lastAutoTable.finalY || (finalY + 10);
+
+        doc.setFontSize(14);
+        doc.text("Expense Details", 14, finalY + 15);
+
         const tableBody = filteredExpenses.map(e => [
             `#EXP-${e.id}`, 
             e.category, 
@@ -239,7 +286,7 @@ if (generateReportBtn) {
         doc.autoTable({
             head: [['Expense ID', 'Category', 'Amount', 'Date', 'Status']],
             body: tableBody,
-            startY: 35,
+            startY: finalY + 20,
             theme: 'grid',
             styles: { fontSize: 9, cellPadding: 4 },
             headStyles: { fillColor: [30, 64, 175] }
