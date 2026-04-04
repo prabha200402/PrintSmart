@@ -199,7 +199,7 @@
                     <tr><td colspan="6" class="loading">Loading customers...</td></tr>
                 </tbody>
             </table>
-            <div id="paginationControls" class="pagination"></div>
+        
         </div>
 
         <button class="report-btn" id="reportBtn">
@@ -296,7 +296,6 @@
     // CUSTOMER MANAGEMENT JS (no order history)
     // ========================
     const API_URL = '../../Backend/api/customers.php';
-    let currentPage = 1;
     let currentSearch = '';
 
     // DOM Elements
@@ -354,25 +353,24 @@
         if (!str) return '';
         return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
     }
-
     async function loadCustomers() {
-        try {
-            let url = `${API_URL}?page=${currentPage}&limit=5`;
-            if (currentSearch) url += `&search=${encodeURIComponent(currentSearch)}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            if (data.success) {
-                renderTable(data.data);
-                renderPagination(data.page, data.totalPages, data.total);
-            } else {
-                showToast('Failed to load customers', true);
-                tbody.innerHTML = '<tr><td colspan="6" class="loading">Error loading data</td></tr>';
-            }
-        } catch (err) {
-            showToast('Server error - unable to connect', true);
-            tbody.innerHTML = '<tr><td colspan="6" class="loading">Connection error</td></tr>';
+    try {
+        let url = `${API_URL}?limit=10000`;   // fetch all customers
+        if (currentSearch) url += `&search=${encodeURIComponent(currentSearch)}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data.success) {
+            renderTable(data.data);
+            // no pagination call
+        } else {
+            showToast('Failed to load customers', true);
+            tbody.innerHTML = '<tr><td colspan="6" class="loading">Error loading data</td></tr>';
         }
+    } catch (err) {
+        showToast('Server error - unable to connect', true);
+        tbody.innerHTML = '<tr><td colspan="6" class="loading">Connection error</td></tr>';
     }
+}
 
     function renderTable(customers) {
         if (!customers.length) {
@@ -405,27 +403,7 @@
         tbody.innerHTML = html;
     }
 
-    function renderPagination(current, totalPages, total) {
-        if (totalPages <= 1 && total <= 5) {
-            paginationDiv.innerHTML = `<div>Showing ${total} of ${total} results</div>`;
-            return;
-        }
-        const start = (current - 1) * 5 + 1;
-        const end = Math.min(current * 5, total);
-        let html = `<div>Showing ${start} to ${end} of ${total} results</div><div style="display:flex; gap:8px;">`;
-        for (let i = 1; i <= totalPages; i++) {
-            html += `<button class="page-btn ${i === current ? 'active' : ''}" data-page="${i}">${i}</button>`;
-        }
-        html += `</div>`;
-        paginationDiv.innerHTML = html;
-        document.querySelectorAll('.page-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                currentPage = parseInt(btn.dataset.page);
-                loadCustomers();
-            });
-        });
-    }
-
+  
     function showDeleteConfirm(id, name) {
         pendingDeleteId = id;
         pendingDeleteName = name;
@@ -440,7 +418,6 @@
             const data = await res.json();
             if (data.success) {
                 showToast(`✅ "${pendingDeleteName}" deleted successfully`);
-                currentPage = 1;
                 loadCustomers();
             } else {
                 showToast('Delete failed: ' + data.message, true);
@@ -485,7 +462,6 @@
                 showToast('✅ Customer added successfully');
                 modal.style.display = 'none';
                 resetModalToAdd();
-                currentPage = 1;
                 loadCustomers();
             } else {
                 showToast('Error: ' + data.message, true);
@@ -636,7 +612,6 @@
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             currentSearch = e.target.value.trim();
-            currentPage = 1;
             loadCustomers();
         }, 500);
     });
